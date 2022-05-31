@@ -1,6 +1,19 @@
 #This class is used to handle the database. It is used to create, read, update and delete data from the database.
 import sqlite3
 import Employee
+import re
+
+#Regex to check if string is valid email
+regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+
+#Function to check if the email is valid
+def check(email):
+  # pass the regular expression
+  # and the string into the fullmatch() method
+  if(re.fullmatch(regex, email)):
+    return True
+  else:
+    return False
 
 class DBOperations():
   #SQL statements
@@ -73,10 +86,46 @@ class DBOperations():
           emp.set_employee_id(int(input("Enter Employee ID: ")))
         else:
           break
-      emp.set_employee_title(input("Enter Employee Title: "))
+        
+      #Ask for a employee title : Mr, Mrs, Miss, Dr, Prof, N/A
+      while True:
+        print("Enter Employee Title: ")
+        print("1. Mr")
+        print("2. Mrs")
+        print("3. Miss")
+        print("4. Dr")
+        print("5. Prof")
+        print("6. N/A")
+        #Get user input and assign it to the employee title
+        if int(input()) == 1:
+          emp.set_employee_title("Mr")
+          break
+        elif int(input()) == 2:
+          emp.set_employee_title("Mrs")
+          break
+        elif int(input()) == 3:
+          emp.set_employee_title("Miss")
+          break
+        elif int(input()) == 4:
+          emp.set_employee_title("Dr")
+          break
+        elif int(input()) == 5:
+          emp.set_employee_title("Prof")
+          break
+        elif int(input()) == 6:
+          emp.set_employee_title("N/A")
+          break
+        else:
+          print("Invalid input. Please try again")
       emp.set_employee_forename(input("Enter Employee Name: "))
       emp.set_employee_surname(input("Enter Employee Surname: "))
-      emp.set_employee_email(input("Enter Employee Email: "))
+      while True:
+        email = input("Enter Employee Email: ")
+        if(check(email)):
+          emp.set_employee_email(email)
+          break
+        else:
+          print("Invalid Email. Please try again")
       emp.set_employee_salary(float(input("Enter Employee Salary: ")))
 
 
@@ -236,4 +285,5 @@ class DBOperations():
       print(e)
     finally:
       self.conn.close()
-      
+  
+ 
