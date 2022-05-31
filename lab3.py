@@ -1,7 +1,18 @@
 #Import the necessary classes, DBHandler
 import DBHandler as DB
+import os
 
 DBCommand = DB.DBOperations()
+
+
+ 
+def clearConsole():
+    command = 'clear'
+    if os.name in ('nt', 'dos'):  # If Machine is running on Windows, use cls
+        command = 'cls'
+    os.system(command)
+
+clearConsole()
 
 #Wait for user input
 def wait():
