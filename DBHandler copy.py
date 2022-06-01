@@ -7,22 +7,6 @@ import os
 #Regex to check if string is valid email
 regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
-titles = ["Mr" , "Mrs", "Miss", "Dr", "Prof", "N/A"]
-
-def get_user_confirmation(notification):
-  print(notification)
-  print("1. Yes")
-  print("2. No")
-  try:
-    user = int(input())
-    if user==1:
-      return True
-    else:
-      return False
-  except ValueError:
-    return False
-
-
 #Function that displays list for user selection and returns selection as String
 def make_selection(array):
   while True :
@@ -38,13 +22,12 @@ def make_selection(array):
     try:
       userinput = int(input()) - 1
       if userinput < 0 or userinput > len(array) -1 :
-        clearConsole()
-        print("Invalid selection. Please choose from the following :")
+        print("Invalid selection")
       else: 
+        print(array[userinput])
         return array[userinput]
     except ValueError:
-      clearConsole()
-      print("Invalid selection. Please choose from the following :")
+      print("Invalid Selection")
     
 #Function to check if the email is valid
 def check(email):
@@ -137,18 +120,46 @@ class DBOperations():
           print("Please enter digits only")
 
       clearConsole()
-      title = make_selection(titles)
-      if type(title) == str:
-        emp.set_employee_title(title)
-      else : 
-        print("Error in parsing title")
-        return False
-  
+      array = ["Test1","test 2"]
+      make_selection(array)
+      #Ask for a employee title : Mr, Mrs, Miss, Dr, Prof, N/A
+      while True:
+        try:
+          print("Enter Employee Title: ")
+          print("1. Mr")
+          print("2. Mrs")
+          print("3. Miss")
+          print("4. Dr")
+          print("5. Prof")
+          print("6. N/A")
+          #Get user input and assign it to the employee title
+          title = int(input())
+          if title == 1:
+            emp.set_employee_title("Mr")
+            break
+          elif title == 2:
+            emp.set_employee_title("Mrs")
+            break
+          elif title == 3:
+            emp.set_employee_title("Miss")
+            break
+          elif title == 4:
+            emp.set_employee_title("Dr")
+            break
+          elif title == 5:
+            emp.set_employee_title("Prof")
+            break
+          elif title == 6:
+            emp.set_employee_title("N/A")
+            break
+          else:
+            print("Invalid input. Please try again")
+        except ValueError:
+          print("Please select an option using digits only")
+          
       clearConsole()
-      
       emp.set_employee_forename(input("Enter Employee Name: "))
       emp.set_employee_surname(input("Enter Employee Surname: "))
-      
       clearConsole()
       while True:
         email = input("Enter Employee Email: ")
@@ -162,7 +173,6 @@ class DBOperations():
       while True:    
         try:
           emp.set_employee_salary(float(input("Enter Employee Salary: ")))
-          break;
         except ValueError:
           print("Wrong format, please use digits and \".\" only")
       clearConsole()
@@ -175,22 +185,27 @@ class DBOperations():
       print("Employee Email: ", emp.get_employee_email())
       print("Employee Salary: $", emp.get_employee_salary())
       
-      print("\n")
-      if get_user_confirmation("Do you want to insert this data?") == True:
+      print("/n")
+      print("Do you want to insert this data?")
+      print("1. Yes")
+      print("2. No")
+      try:
+        user = input()
+        if user==1:
           self.get_connection()
           self.cur.execute(self.sql_insert,tuple(str(emp).split("\n")))
 
           self.conn.commit()
           print("Inserted data successfully")
-      else:
-        print("Data not inserted")
-
+        else:
+          print("Data not inserted")
+      except ValueError:
+        print("Data not inserted")    
     except Exception as e:
       print(e)
     finally:
       self.conn.close()
 
-  #TODO
   #Function to delete an entry from the table using employee ID
   def delete_data(self):
     try:
@@ -311,36 +326,28 @@ class DBOperations():
           break
         
       #EmployeeID exists. Ask the user for the new details
-      clearConsole()
-      title = make_selection(titles)
-      if type(title) == str:
-        empTitle = title
-      else : 
-        print("Error in parsing title")
-        return False
-      
+      empTitle = (input("Enter Employee Title: "))
       empName = (input("Enter Employee Name: "))
       empSurname = (input("Enter Employee Surname: "))
-      clearConsole()
       empEmail = (input("Enter Employee Email: "))
-      clearConsole()
-      while True:    
-        try:
-          empSalary = (float(input("Enter Employee Salary: ")))
-          break;
-        except ValueError:
-          print("Wrong format, please use digits and \".\" only")
+      empSalary = (float(input("Enter Employee Salary: ")))
+      
       #Get user confirmation
-      clearConsole()
       print("Are you sure you want to update the following details?")
       print("Employee ID: " + str(empID) + "\nEmployee Title: " + empTitle + "\nEmployee Name: " + empName + "\nEmployee Surname: " + empSurname + "\nEmployee Email: " + empEmail + "\nEmployee Salary: " + str(empSalary))
-      if get_user_confirmation("\n") == True :
+      print("1. Yes")
+      print("2. No")
+      confirmation = int(input("Enter your choice: "))
+      if confirmation != 1:
+        print("Update cancelled")
+        return False
+      elif confirmation == 1:
         self.get_connection()
-        self.cur.execute(self.sql_update_data,(empTitle, empName, empSurname, empEmail, empSalary, empID))
+        self.cur.execute(sql_update_data,(empTitle, empName, empSurname, empEmail, empSalary, empID))
         self.conn.commit()
         print("Updated data successfully")
-      else:
-        print("Update cancelled")    
+     
+
     except Exception as e:
       print(e)
     finally:

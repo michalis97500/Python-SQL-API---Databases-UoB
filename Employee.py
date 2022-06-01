@@ -31,16 +31,16 @@ class Employee:
   def get_employee_title(self):
     return self.empTitle
   
-  def get_forename(self):
+  def get_employee_forename(self):
     return self.forename
   
-  def get_surname(self):
+  def get_employee_surname(self):
     return self.surname
   
-  def get_email(self):
+  def get_employee_email(self):
     return self.email
   
-  def get_salary(self):
+  def get_employee_salary(self):
     return self.salary
 
   def __str__(self):

@@ -5,7 +5,7 @@ import os
 DBCommand = DB.DBOperations()
 
 
- 
+#Clear console 
 def clearConsole():
     command = 'clear'
     if os.name in ('nt', 'dos'):  # If Machine is running on Windows, use cls
@@ -17,6 +17,7 @@ clearConsole()
 #Wait for user input
 def wait():
   input("Press Enter to continue...")
+  clearConsole()
   
 while True:
   print ("\n Menu:")
@@ -30,6 +31,7 @@ while True:
   print (" 7. Exit\n")
 
   __choose_menu = int(input("Enter your choice: "))
+  clearConsole()
   if __choose_menu == 1:
     DBCommand.create_table()
     wait()
