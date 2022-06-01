@@ -197,7 +197,19 @@ class DBOperations():
       self.get_connection()
       #Get employee ID
       employeeID = int(input("Enter Employee ID: "))
-      #Check if the employee ID exists in the table. If it does then print the Name and Surname of the employee to delete
+      #Check if the employee ID exists in the table. If it does then print the Name and surname of the employee
+      if self.search_database(False, "EmployeeID", employeeID) == True:
+        employee = self.get_employee_data(employeeID)
+        print("Employee to be deleted: ", employee[0][1] , employee[0][2] ,  employee[0][3], " with ID: ", employee[0][0])
+        if get_user_confirmation("Do you want to delete this data?") == True:
+          self.get_connection()
+          self.cur.execute(self.sql_delete_data, (employeeID,))
+          self.conn.commit()
+          print("Deleted data successfully")
+        else:
+          print("Data not deleted")
+      else:
+        print("Employee does not exists in the database. Please check the Employee ID")
     except Exception as e:
       print(e)
     finally:
@@ -224,8 +236,25 @@ class DBOperations():
       result = self.cur.fetchall()
       
       for row in result:
-        print(row)
-    except sqlite3.Error() as e:
+        print(row[0],row[1],row[2],row[3],row[4],row[5])
+    except sqlite3.Error() as error:
+      print(error)
+    except Exception as e:
+      print(e)   
+    finally:
+      self.conn.close()
+
+  #Function to get Employee data from the table using employee ID
+  def get_employee_data(self, employeeID):
+    try:
+      self.get_connection()
+      
+      if type(employeeID) == int:
+        self.cur.execute(self.sql_search_database + "EmployeeID = ?", (employeeID,))
+        result = self.cur.fetchall()
+        return result
+      return "No data found"
+    except Exception as e:
       print(e)
     finally:
       self.conn.close()
@@ -286,7 +315,7 @@ class DBOperations():
       else:
         if display:
           for row in result:
-            print(row)
+            print(row[0],row[1],row[2],row[3],row[4],row[5])
         return True
     except sqlite3.Error as error:
       print(error)

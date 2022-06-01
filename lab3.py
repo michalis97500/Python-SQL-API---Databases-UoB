@@ -22,12 +22,12 @@ def wait():
 while True:
   print ("\n Menu:")
   print ("**********")
-  print (" 1. Create table EmployeeUoB")
-  print (" 2. Insert data into EmployeeUoB")
-  print (" 3. Select all data into EmployeeUoB")
-  print (" 4. Search an employee")
-  print (" 5. Update data some records")
-  print (" 6. Delete data some records")
+  print (" 1. Create Employee Table")
+  print (" 2. Insert data into Employee Table")
+  print (" 3. Select all data from Employee Table")
+  print (" 4. Search data from Employee Table")
+  print (" 5. Update data records")
+  print (" 6. Delete data records")
   print (" 7. Exit\n")
 
   __choose_menu = int(input("Enter your choice: "))
