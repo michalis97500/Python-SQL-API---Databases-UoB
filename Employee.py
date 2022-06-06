@@ -44,5 +44,5 @@ class Employee:
     return self.salary
 
   def __str__(self):
-    return str(self.employeeID)+"\n"+self.empTitle+"\n"+ self.forename+"\n"+self.surname+"\n"+self.email+"\n"+str(self.salary)
+    return [[str(self.employeeID) , self.empTitle , self.forename , self.surname , self.email , "$"+str(self.salary)]]
 
