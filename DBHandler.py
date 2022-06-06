@@ -117,28 +117,20 @@ class DBOperations():
     def database_op(self):
         while True:
             clearConsole()
-            print("1. Create Table")
-            print("2. Delete Table")
-            print("3. Exit")
-            userinput = input()
-            try:
-                userinput = int(userinput)
-                if userinput == 1:
-                    self.create_table()
-                elif userinput == 2:
-                    clearConsole()
-                    if get_user_confirmation("Are you sure you want to delete the table?") == True:
-                        self.drop_table()
-                    else:
-                        clearConsole()
-                        print("Operation cancelled. Returning to main menu")
-                        return False
-                elif userinput == 3:
-                    return
+            userinput = make_selection(array=["Create Table", "Delete Table"])
+            if userinput == "Create Table":
+                self.create_table()
+                break
+            elif userinput == "Delete Table":
+                clearConsole()
+                if get_user_confirmation(notification="Are you sure you want to delete the table?") == True:
+                    self.drop_table()
+                    break
                 else:
-                    print("Invalid selection. Please choose from the following :")
-            except ValueError:
-                print("Invalid selection. Please choose from the following :")
+                    return False
+            elif userinput == cancel:
+                return False
+            
 
     # Function to create table if a connection exists
     def create_table(self):
@@ -171,15 +163,19 @@ class DBOperations():
             # Check if employee ID exists in the table. If it does warn the user and ask for a new employee ID
             while True:
                 try:
-                    emp.set_employee_id(int(input("Enter Employee ID: ")))
-                    # Search for the employeeID in the table
-                    if self.search_database(False, "EmployeeID", emp.get_employee_id()) == False:
-                        break
+                    print("To cancel, enter \"exit\"")
+                    empID = input("Enter Employee ID: ")
+                    if empID.lower() == "exit":
+                        return False
+                    empID = int(empID)
+                    # Check if the employee ID exists in the table
+                    if self.search_database(False, "EmployeeID", str(empID)) == True:
+                        clearWithMessage("Employee ID already exists. Please enter different ID")
                     else:
-                        print(
-                            "Employee ID already exists. Please enter a new Employee ID")
+                        emp.set_employee_id(empID)
+                        break
                 except ValueError:
-                    print("Please enter digits only")
+                    clearWithMessage("Please enter digits only")
 
             clearConsole()
             title = make_selection(titles)
@@ -192,43 +188,59 @@ class DBOperations():
                 print("Error in parsing title")
                 return False
 
-            clearConsole()
-
-            emp.set_employee_forename(input("Enter Employee Name: "))
-            emp.set_employee_surname(input("Enter Employee Surname: "))
+            clearWithMessage("Enter \"exit\" to cancel")
+            empName = input("Enter Employee Name: ")
+            if empName.lower() == "exit" or empName == "":
+                print("Operation cancelled")
+                input("Press enter to continue")
+                return False
+            else:
+                emp.set_employee_forename(empName)
+                
+            clearWithMessage("Enter \"exit\" to cancel")
+            empName = input("Enter Employee Surame: ")
+            if empName.lower() == "exit" or empName == "":
+                print("Operation cancelled")
+                input("Press enter to continue")
+                return False
+            else:
+                emp.set_employee_surname(empName)
 
             clearConsole()
             while True:
-                email = input("Enter Employee Email: ")
+                email = input("Enter new email: ")
                 if(check(email)):
                     emp.set_employee_email(email)
                     break
+                elif email.lower() == "exit":
+                    print("Operation cancelled")
+                    input("Press enter to continue")
+                    break
                 else:
-                    print("Invalid Email. Please try again")
-
+                    clearWithMessage("Invalid Email. Please try again")
+                    continue
             clearConsole()
             while True:
-                try:
-                    emp.set_employee_salary(
-                        float(input("Enter Employee Salary: ")))
+                print("Enter \"exit\" to cancel")
+                salary = input("Enter new salary: ")
+                if salary.lower() == "exit" or salary == "":
+                    print("Operation cancelled")
+                    input("Press enter to continue")
                     break
-                except ValueError:
-                    print("Wrong format, please use digits and \".\" only")
+                else:
+                    try:
+                        salary = int(float(salary))
+                        emp.set_employee_salary(salary)
+                        break
+                    except ValueError:
+                        clearWithMessage("Wrong format, please use digits and \".\" only")
             clearConsole()
-
-            # Get user confirmation before executing query. Display all data to be inserted
-            print("Employee ID: ", emp.get_employee_id())
-            print("Employee Title: ", emp.get_employee_title())
-            print("Employee Name: ", emp.get_employee_forename())
-            print("Employee Surname: ", emp.get_employee_surname())
-            print("Employee Email: ", emp.get_employee_email())
-            print("Employee Salary: $", emp.get_employee_salary())
+            print ("\n",tabulate(emp.__str__(), headers=["Employee ID", "Employee Title", "Emloyee Name", "Employee Surame", "Employee Email", "Employee Salary"]))
 
             print("\n")
             if get_user_confirmation("Do you want to insert this data?") == True:
                 self.get_connection()
-                self.cur.execute(self.sql_insert, tuple(str(emp).split("\n")))
-
+                self.cur.execute(self.sql_insert, (emp.get_employee_id(), emp.get_employee_title(), emp.get_employee_forename(), emp.get_employee_surname(), emp.get_employee_email(), emp.get_employee_salary()))
                 self.conn.commit()
                 print("Inserted data successfully")
             else:
@@ -521,12 +533,16 @@ class DBOperations():
                 if get_user_confirmation("\nEnter selection") == True:
                     try: 
                         self.get_connection()
+                        self.cur.execute(self.sql_delete_data, (old.get_employee_id(),))
+                        self.conn.commit()
                         self.cur.execute(self.sql_insert, (new.get_employee_id(), new.get_employee_title(), new.get_employee_forename(), new.get_employee_surname(), new.get_employee_email(), new.get_employee_salary()))
-                        self.cur.execute(self.sql_delete, (old.get_employee_id(),))
                         self.conn.commit()
                         print("Updated data successfully")
                         break
-                    except sqlite3.error():
+                    except Exception as e:
+                        print(e)
+                        break
+                    except sqlite3.Error():
                         print("Error updating data")
                         break
                     finally :
